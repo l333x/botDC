@@ -1,13 +1,6 @@
 /**
  * supabase.js — Servicio para la base de datos Supabase.
  * Maneja la memoria/historial de conversación de cada usuario.
- *
- * Tabla requerida en Supabase:
- *   CREATE TABLE memoria_usuarios (
- *     discord_id TEXT PRIMARY KEY,
- *     historial JSONB DEFAULT '[]'::jsonb,
- *     updated_at TIMESTAMPTZ DEFAULT NOW()
- *   );
  */
 
 const { createClient } = require('@supabase/supabase-js');
@@ -61,7 +54,7 @@ async function guardarHistorial(discordId, historial) {
                 {
                     discord_id: discordId,
                     historial: recortado,
-                    updated_at: new Date().toISOString(),
+                    ultima_interaccion: new Date().toISOString(),
                 },
                 { onConflict: 'discord_id' },
             );
