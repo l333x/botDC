@@ -1,8 +1,6 @@
 /**
  * mencionar.js — Comando /mencionar
  * Genera un mensaje creativo con Gemini y etiqueta a un usuario.
- *
- * Uso: /mencionar usuario:@alguien vibra:"Insulto amigable"
  */
 
 const { SlashCommandBuilder } = require('discord.js');
@@ -25,28 +23,36 @@ module.exports = {
                 .setDescription('Elige el tono del mensaje.')
                 .setRequired(true)
                 .addChoices(
-                    { name: '🔥 Insulto amigable', value: 'Insulto amigable' },
-                    { name: '💖 Declaración de amor cringe', value: 'Declaración de amor cringe' },
-                    { name: '🧠 Dato perturbador', value: 'Dato perturbador' },
-                    { name: '🗣️ Chisme falso', value: 'Chisme falso' },
+                    // Aquí ponemos values CORTOS para que Discord no tire error
+                    { name: '🤬 Insulto crudo', value: 'insulto' },
+                    { name: '💖 Amor romántico', value: 'amor' },
+                    { name: '🔥 Vibra sexual', value: 'sexual' },
                 ),
         ),
 
     // ─── Ejecución del comando ─────────────────────────────────────────
     async execute(interaction) {
-        // Diferir la respuesta porque Gemini puede tardar unos segundos
         await interaction.deferReply();
 
         const usuario = interaction.options.getUser('usuario');
-        const vibra = interaction.options.getString('vibra');
+        const vibraCorta = interaction.options.getString('vibra');
+
+        // Aquí traducimos la palabra corta a la orden destructiva para Gemini
+        let instruccionGemini = '';
+        if (vibraCorta === 'insulto') {
+            instruccionGemini = 'Un insulto normal, directo, tóxico y sin censura.';
+        } else if (vibraCorta === 'amor') {
+            instruccionGemini = 'Una declaración de amor profunda, sincera y muy romántica.';
+        } else if (vibraCorta === 'sexual') {
+            instruccionGemini = 'Un comentario muy subido de tono, atrevido, caliente y seductor con doble sentido latino.';
+        }
 
         try {
-            // Generar el mensaje con Gemini Flash
-            const mensaje = await generarMensaje(vibra, usuario.displayName);
+            // Le mandamos la instrucción completa a Gemini
+            const mensaje = await generarMensaje(instruccionGemini, usuario.displayName);
 
-            // Enviar el mensaje etiquetando al usuario
             await interaction.editReply(
-                `<@${usuario.id}>, Gemini tiene algo que decirte:\n\n> ${mensaje}`,
+                `<@${usuario.id}>, EX tiene algo que decirte:\n\n> ${mensaje}`,
             );
         } catch (error) {
             console.error('❌ Error en /mencionar:', error);
